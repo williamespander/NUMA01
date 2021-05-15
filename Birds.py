@@ -1,25 +1,22 @@
-from matplotlib.pyplot import *
-from numpy import *
-from datetime import *
+import datetime
 import pytz
+import pandas
+import csv
+with open("/Users/williamkaul/Downloads/bird_jan25jan16.txt") as txt:
+    L = [(pytz.utc.localize(datetime.datetime.strptime(line.split(sep="  ", maxsplit=1)[0],'%Y-%m-%d %H:%M:%S.%f')).astimezone(pytz.timezone('Europe/Stockholm')),
+          int(line.split(sep="  ", maxsplit=1)[1])) for line in txt]
+    #L = [(datetime.datetime.strptime(line.split(sep="  ", maxsplit=1)[0],'%Y-%m-%d %H:%M:%S.%f').astimezone(pytz.timezone('UTC')), int(line.split(sep="  ", maxsplit=1)[1])) for line in txt]
+txt.close()
+print(L[0])
 
-lines = []
-CETtimezonelist = []
-# Reading and closing Datafile with "with/as" statement
-with open("bird_jan25jan16.txt", "r") as datafile:
-    lines = datafile.readlines()
-# Looping through the list and converting string to tuple with datetime obj.
-# and the number of registered movements. 
-for i in range(len(lines)):
-    # Consider removing microseconds to improve speed
-    lines[i] = (datetime.strptime(lines[i][0:26], 
-                                  '%Y-%m-%d %H:%M:%S.%f').astimezone(
-                                      pytz.timezone('UTC'))
-                ,lines[i][30:-2])
-    # Appending CETtimezonelist with timezone-converted tuples
-    CETtimezonelist.append((lines[i][0].astimezone(pytz.timezone
-                                                   ('Europe/Stockholm')), 
-                            lines[i][1]))
+    #astimezone(pytz.timezone('UTC')
+#col2 = [int(line.split(sep="  ", maxsplit=1)[1]) for line in lines]
 
-print(lines[30222])
-print(CETtimezonelist[26356])
+#datetime.datetime.strptime(f.icol(0),'%Y-%m-%d %H:%M:%S.%f');
+
+#print(txt.splitlines()[9])
+#for line in txt.splitlines()[1:3]:
+#    dates.append(datetime.datetime.strptime(line[:-7],'%Y-%m-%d %H:%M:%S.%f'))
+            #datestring="2015-01-25 14:24:04.558621"#    70
+            #dateobj=datetime.datetime.strptime(datestring, '%Y-%m-%d %H:%M:%S.%f')
+
