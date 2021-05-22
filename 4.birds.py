@@ -30,6 +30,14 @@ class Birds:
                 except ValueError:
                     pass
         self.dt = self.data
+    
+    def Step1(self):
+        for i, element in enumerate(self.data):
+            if isinstance(self.data[30], int):
+                self.data.drop([i])
+            else:
+                continue
+            
         
     def Step2(self):
         dt=datetime.timedelta(minutes=2)
@@ -50,8 +58,9 @@ class Birds:
                 pass
             #print(i,element)
 
-BirdsData = Birds("C:/Users/claud/OneDrive/Documents/bird_jan25jan16.txt")
+BirdsData = Birds(r"C:\Users\nordq\OneDrive\Dokument\GitHub\NUMA01\bird_jan25jan16.txt")
 #BirdsData.Step2()
-BirdsData.Step3()
-print(BirdsData.data[502:510])
+BirdsData.Step1()
+print(BirdsData.data[5374:5376])
+#print(BirdsData.data[502:510])
 #print(len(BirdsData.data))
