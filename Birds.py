@@ -8,63 +8,137 @@ Created on Sat May 22 18:04:50 2021
 import datetime
 import pytz
 from matplotlib.pyplot import *
+# ASTRAL CAN BE USED FOR SUNRISE/SUNSET TIMES.
+# import astral
 
-class Birds:
+class birds:
+    '''
+    Class processes a datafile which registers in- and out-movements of
+    a bird at a nesting box. The data in the file contains lines of the
+    type:
+        
+        2015-03-01 14:22:05.911302    2072
+    
+    with the date, the time in UTC and the total number of registered
+    movements so far.
+    '''
     def __init__(self, textfile):
         self.data = []
+        # Opening file and appending list "self.data" with lists that
+        # contain the date in datetime format and the number of movements
+        # in int data type. Datetime objects are instantly converted from
+        # UTC timezone to CET timezone. The instantiation raises an
+        # exception on one line in which the data was corrupted.
+        
+        # ISSUE: I JUST TRIED TO MAKE THIS LOOK A BIT PRETTIER BUT IT
+        #        DOESN'T WORK FOR WHATEVER REASON. LESS PRETTY, BUT
+        #        FUNCTIONAL CODE BELOW.
+        # with open(textfile, "r") as txt:
+        #     for line in txt:
+        #         try:
+        #             self.data.append
+        #             ([pytz.utc.localize(datetime.datetime.strptime
+        #                                 (line.split(sep="  ", maxsplit=1)
+        #                                  [0], '%Y-%m-%d %H:%M:%S.%f'))
+        #               .astimezone(pytz.timezone('Europe/Stockholm'))
+        #               ,int(line.split(sep="  ", maxsplit=1)[1])])
+        #         except ValueError:
+        #             pass
         with open(textfile, "r") as txt:
             for line in txt:
                 try:
-                    self.data.append([pytz.utc.localize(datetime.
-                                                        datetime.strptime
-                                                        (line.split(sep="  ",
-                                                        maxsplit=1)
-                                                        [0], 
-                                                        '%Y-%m-%d %H:%M:%S.%f'))
-                                      .astimezone(pytz.timezone
-                                                  ('Europe/Stockholm'))
-                                      ,int(line.split(sep="  ", maxsplit=1)
-                                           [1])])
+                    # Lägg till en entry när timedelta är för stort!
+                    # if ...... :
+                    self.data.append([pytz.utc.localize(
+                        datetime.datetime.strptime(line.split(sep="  ", 
+                                                              maxsplit=1)[0]
+                                                   ,'%Y-%m-%d %H:%M:%S.%f'))
+                        .astimezone(pytz.timezone('Europe/Stockholm')), 
+                        int(line.split(sep="  ", maxsplit=1)[1])])
                 except ValueError:
                     pass
         print(len(self.data))
-
-    def Step1(self, start, end):
-        for i in range(start, end):
-            if self.data[i-1][1] == self.data[i+1][1] and self.data[i][1] != self.data[i-1][1]:
-                self.data[i][1] = self.data[i-1][1]
-            print(self.data[i][1])
-        
-
-    def Step2(self): #ta bort datum som går backåt i tiden + lägger in tider för rader som ej finns
-        dt=datetime.timedelta(minutes=4)
-        for i, element in enumerate(self.data):
+    
+    def preprocess(self):
+        '''
+        Method preprocesses the datafile. Data corruption were counts are
+        reported incompletely are replaced. If lines are missing, they are
+        added. If there are more than 4 movements registered per minute,
+        they are changed to 0.
+    
+        PARAMETERS
+    
+        self: (.txt file) 
+            A textfile with dates, times and numbers that correspond to
+            movements of Birds. Datetime must be in format 
+            '%Y-%m-%d %H:%M:%S.%f' and the corresponding integer should
+            be separated by spaces. Each datapoint has to be separated by
+            a new line.
+        '''
+        # Sorting the data chronologically
+        self.data.sort(key=lambda x: x[0])
+        # If the items that come before or after a certain index in the
+        # list of number of registered movements are the same but the
+        # middle value is different, the middle value is changed to match
+        # the previous value. IndexErrors are passed.
+        for i in range(len(self.data)):
             try:
-                if element[0]+dt < self.data[i+1][0]:
-                    self.data.insert(i+1, [element[0]+dt,element[1]])
-                while element[0] > self.data[i+1][0]:
-                    del self.data[i+1]
+                if (self.data[i-1][1] == self.data[i+1][1] and 
+                        self. data[i][1] != self.data[i-1][1]):
+                    self.data[i][1] = self.data[i-1][1]
             except IndexError:
                 pass
-            # print(i, element)
-
-    def Step3(self):
-        for i, element in enumerate(self.data):
+        # If the absolute value of the difference between the next and the
+        # current item in the list is less than or equal to 8, the current
+        # item takes on the value of the difference. Otherwise, the
+        # current value is set to 0. IndexErrors are passed.
+        # ISSUE: THE CURRENT CODE ASSIGNS THE VALUE TO THE EARLIER TIME 
+        #        BUT IT WOULD BE MORE INTUITIVE IF THE VALUE WAS ASSIGNED
+        #        TO THE LATER TIME. WE SHOULD ALSO CONSIDER CHANGING THE
+        #        VALUES TO 8 INSTEAD OF 0 IF THE NUMBER IS PRETTY CLOSE TO
+        #        8.
+        for i in range(len(self.data)):
             try:
-                  if element[1]+8 <= self.data[i+1][1]:
-                      self.data[i][1]=element[1]+8
+                if (self.data[i+1][1] - self.data[i][1] <= 8 and
+                    self.data[i+1][1] - self.data[i][1] >= 0):
+                    self.data[i][1] = abs(self.data[i+1][1] - 
+                                          self.data[i][1])
+                else:
+                    self.data[i][1] = 0
             except IndexError:
                 pass
+        # Removes and adds lines based on timedeltas which are too low or
+        # high.
+        # ISSUE: FOR SOME REASON NO ITEMS ARE DELETED WHILE 20-30K ITEMS
+        #        ARE ADDED IN THE LATTER PART.
+        i = 0
+        while (i <= len(self.data)):
+            try:
+                if (self.data[i][0] + datetime.timedelta
+                        (minutes=1, seconds=40) > self.data[i+1][0]):
+                    if (self.data[i][1] != 0):
+                        pass
+                    else:
+                        del self.data[i][0]
+                elif (self.data[i][0] + datetime.timedelta(minutes=3) <
+                          self.data[i+1][0]):
+                    self.data.insert(i + 1, [self.data[i][0] + 
+                                              datetime.timedelta(minutes=2)
+                                              , self.data[i][1]])
+            except IndexError:
+                pass
+            i += 1
+
+    # Plots a graph within a given interval.
     def plot(self, start, end):
         x_values = [BirdsData.data[i][0] for i in range(start, end)]
         y_values = [abs(BirdsData.data[i][1] - BirdsData.data[i-1][1]) 
                     for i in range(start, end)]
         show()
-BirdsData = Birds("bird_jan25jan16.txt")
-BirdsData.Step1(5370, 5380)
-BirdsData.Step2()
-print(len(BirdsData.data))
-# BirdsData.Step3()
+        
+birdsData = birds(r"C:\Users\willi\Documents\GitHub\NUMA01\bird_jan25jan16.txt")
+birdsData.preprocess()
+print(len(birdsData.data))
 
 
 #ställen där de går bakåt i tiden
