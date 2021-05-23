@@ -65,11 +65,6 @@ BirdsData.Step1(5370, 5380)
 # BirdsData.Step3()
 
 
-x_values = [BirdsData.data[i][0] for i in range(300, 5000)]
-y_values = [abs(BirdsData.data[i][1] - BirdsData.data[i-1][1]) for i in range(300, 5000)]
-plot(x_values, y_values)
-show()
-
 #ställen där de går bakåt i tiden
 #2016-01-12 22:18:05.547619    0
 
