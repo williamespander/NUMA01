@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 """
 Created on Sat May 22 18:04:50 2021
 
@@ -54,7 +54,11 @@ class Birds:
                       self.data[i][1]=element[1]+8
             except IndexError:
                 pass
-
+    def plot(self, start, end):
+        x_values = [BirdsData.data[i][0] for i in range(start, end)]
+        y_values = [abs(BirdsData.data[i][1] - BirdsData.data[i-1][1]) 
+                    for i in range(start, end)]
+        show()
 BirdsData = Birds("bird_jan25jan16.txt")
 BirdsData.Step1(5370, 5380)
 # BirdsData.Step2()
