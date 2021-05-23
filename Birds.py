@@ -27,26 +27,13 @@ class Birds:
                                            [1])])
                 except ValueError:
                     pass
-    # def Step1(self): #ändrar fel element där antalet blir ett fel värde som 2172 072 2172
-    #     d1=0
-    #     for i, element in enumerate(self.data[75100:76100]): #fixa nollställningen?
-    #         try:
-    #             if element[1] > self.data[i+1][1] and element[1] <= self.data[i+2][1]: #för större säkerhet, öka till i+5 och kör while-loop.
-    #                 self.data[i+1][1]=element[1]
-    #             #if element[1] > self.data[i+1][1] and element[1] > self.data[i+2][1] :
-    #             #    self.data[i + 1][1] = element[1] + self.data[i + 1][1] - d1
-    #             #    if self.data[i+1][1]-d1 > 0:
-    #             #        d1=self.data[i+1][1]-d1
-    #         except IndexError:
-    #             pass
-    #         print(i, element, d1)
-    
-    # def Step1(self):
-    #     for i in range(len(self.data)):
-    #         if self.data[i][1]
-            
-        
 
+    def Step1(self, start, end):
+        for i in range(start, end):
+            if self.data[i-1][1] == self.data[i+1][1] and self.data[i][1] != self.data[i-1][1]:
+                self.data[i][1] = self.data[i-1][1]
+            print(self.data[i][1])
+        
 
     def Step2(self): #ta bort datum som går backåt i tiden + lägger in tider för rader som ej finns
         dt=datetime.timedelta(minutes=2)
@@ -69,12 +56,13 @@ class Birds:
                 pass
 
 BirdsData = Birds("bird_jan25jan16.txt")
-BirdsData.Step2()
-BirdsData.Step3()
+BirdsData.Step1(5370, 5380)
+# BirdsData.Step2()
+# BirdsData.Step3()
 
 
-x_values = [BirdsData.data[i][0] for i in range(300, 2000)]
-y_values = [(BirdsData.data[i][1] - BirdsData.data[i-1][1]) for i in range(300, 2000)]
+x_values = [BirdsData.data[i][0] for i in range(300, 5000)]
+y_values = [abs(BirdsData.data[i][1] - BirdsData.data[i-1][1]) for i in range(300, 5000)]
 plot(x_values, y_values)
 show()
 
