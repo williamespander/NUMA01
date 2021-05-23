@@ -27,6 +27,7 @@ class Birds:
                                            [1])])
                 except ValueError:
                     pass
+        print(len(self.data))
 
     def Step1(self, start, end):
         for i in range(start, end):
@@ -36,7 +37,7 @@ class Birds:
         
 
     def Step2(self): #ta bort datum som går backåt i tiden + lägger in tider för rader som ej finns
-        dt=datetime.timedelta(minutes=2)
+        dt=datetime.timedelta(minutes=4)
         for i, element in enumerate(self.data):
             try:
                 if element[0]+dt < self.data[i+1][0]:
@@ -61,7 +62,8 @@ class Birds:
         show()
 BirdsData = Birds("bird_jan25jan16.txt")
 BirdsData.Step1(5370, 5380)
-# BirdsData.Step2()
+BirdsData.Step2()
+print(len(BirdsData.data))
 # BirdsData.Step3()
 
 
