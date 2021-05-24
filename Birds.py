@@ -142,10 +142,16 @@ class birds:
         dates=[self.data[i][0] for i in range(0, len(BirdsData.data))]
         date = int(len(self.data) / 2)
         while (True):
-            if startdate < self.data[date][0]:
+            if (date = 0):
+                startdateindex = 0
+            if (self.data[date - 1][0] <= startdate
+                    <= self.data[date + 1][0]):
+                startdateindex = date
+                break
+            elif startdate < self.data[date][0]:
                 date = date + int(date / 2)
             elif self.data[date][0] < startdate:
-                date = date - int(date / 2)
+                date = date - int(date / 2)aa
         for date in dates:
             if startdate < date:
                 startdate=date
