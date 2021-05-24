@@ -99,13 +99,16 @@ class birds:
         for i in range(len(self.data)):
             try:
                 if (self.data[i+1][1] - self.data[i][1] <= 8 and
-                    self.data[i+1][1] - self.data[i][1] >= 0):
+                        self.data[i+1][1] - self.data[i][1] >= 0):
                     self.data[i][1] = abs(self.data[i+1][1] - 
                                           self.data[i][1])
                 else:
-                    self.data[i][1] = 0
+                    if (self.data[i+1][1] - self.data[i][1] > 8):
+                        self.data[i][1] = 8
+                    else:
+                        self.data[i][1] = 0
             except IndexError:
-                pass
+                self.data[i][1] = 0
             
         # Removes and adds lines based on timedeltas which are too low or
         # high.
@@ -115,7 +118,7 @@ class birds:
         while (i <= len(self.data)):
             try:
                 if (self.data[i][0] + datetime.timedelta
-                    (minutes=1, seconds=30) > self.data[i+1][0]):
+                    (minutes=0, seconds=0) > self.data[i+1][0]):
                 # if (self.data[i][1] != 0):
                 #     pass
                 # else:
@@ -130,10 +133,43 @@ class birds:
             i += 1
 
     # Plots a graph within a given interval.
-    def plot(self, start, end):
-        x_values = [BirdsData.data[i][0] for i in range(start, end)]
-        y_values = [abs(BirdsData.data[i][1] - BirdsData.data[i-1][1]) 
-                    for i in range(start, end)]
+    def plot(self, startdate=None, numberofdays=None):
+        startdate=pytz.utc.localize(datetime.datetime.strptime
+                                    (startdate,'%Y-%m-%d %H:%M:%S.%f')
+                                    ).astimezone(pytz.timezone(
+                                        'Europe/Stockholm'))
+        dates=[self.data[i][0] for i in range(0, len(BirdsData.data))]
+        date = int(len(self.data) / 2)
+        while (True):
+            if startdate < self.data[date][0]:
+                date = date + int(date / 2)
+            elif self.data[date][0] < startdate:
+                date = date - int(date / 2)
+        for date in dates:
+            if startdate < date:
+                startdate=date
+                enddate=startdate+datetime.timedelta(days=numberofdays)
+                break
+        for i in dates:
+            if enddate < i:
+                return i
+                break
+        endindex = dates.index(i)
+        startindex=dates.index(startdate)
+        changedates = [abs(self.data[i][1] - self.data[i - 1][1]) 
+                       if abs(self.data[i][1] - self.data[i - 1][1])<8 
+                       else 0  for i in range(0, endindex)]
+        if numberofdays < 10:
+            sumdates = []
+            for i in range(startindex, endindex):
+                sumdates.append(sum(changedates[:i+1]))
+            y_values=sumdates
+        else:
+            y_values = changedates[startindex:endindex]
+
+        x_values = [matplotlib.dates.date2num(dates[i]) for i in range(startindex,endindex)]
+        matplotlib.pyplot.plot_date(x_values, y_values, label="Movement", marker=".", markersize="8")
+        title("."); legend(); xticks(rotation=45); xlabel(" "); ylabel(" ")
         show()
         
 birdsData = birds(r"C:\Users\willi\Documents\GitHub\NUMA01\bird_jan25jan16.txt")
