@@ -1,0 +1,27 @@
+    def plot(self, startdate=None, numberofdays=None):
+        startdate=pytz.utc.localize(datetime.datetime.strptime(startdate,'%Y-%m-%d %H:%M:%S.%f')).astimezone(pytz.timezone('Europe/Stockholm'))
+        dates=[self.data[i][0] for i in range(0, len(BirdsData.data))]
+        for i in dates:
+            if startdate < i:
+                startdate=i
+                enddate=startdate+datetime.timedelta(days=numberofdays)
+                break
+        for i in dates:
+            if enddate < i:
+                return i
+                break
+        endindex = dates.index(i)
+        startindex=dates.index(startdate)
+        changedates = [abs(self.data[i][1] - self.data[i - 1][1]) if abs(self.data[i][1] - self.data[i - 1][1])<8 else 0  for i in range(0, endindex)]
+        if numberofdays < 10:
+            sumdates = []
+            for i in range(startindex, endindex):
+                sumdates.append(sum(changedates[:i+1]))
+            y_values=sumdates
+        else:
+            y_values = changedates[startindex:endindex]
+
+        x_values = [matplotlib.dates.date2num(dates[i]) for i in range(startindex,endindex)]
+        matplotlib.pyplot.plot_date(x_values, y_values, label="Movement", marker=".", markersize="8")
+        title("."); legend(); xticks(rotation=45); xlabel(" "); ylabel(" ")
+        show()
