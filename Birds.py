@@ -9,8 +9,9 @@ import datetime
 import pytz
 import numpy
 from matplotlib.pyplot import *
+from astral import Location
 # ASTRAL CAN BE USED FOR SUNRISE/SUNSET TIMES.
-# import astral
+# import astralaa
 
 class birds:
     '''
@@ -27,7 +28,7 @@ class birds:
         self.data = []
         # Opening file and appending list "self.data" with lists that
         # contain the date in datetime format and the number of movements
-        # in int data type. Datetime objects are instantly converted from
+        # in int data type. Datetime objects are converted from
         # UTC timezone to CET timezone. The instantiation raises an
         # exception on one line in which the data was corrupted.
         
@@ -46,6 +47,8 @@ class birds:
         #         except ValueError:
         #             pass
         with open(textfile, "r") as txt:
+            # Source: Google Maps
+            
             for line in txt:
                 try:
                     self.data.append([pytz.utc.localize(
@@ -53,10 +56,10 @@ class birds:
                                                               maxsplit=1)[0]
                                                    ,'%Y-%m-%d %H:%M:%S.%f'))
                         .astimezone(pytz.timezone('Europe/Stockholm')), 
-                        int(line.split(sep="  ", maxsplit=1)[1])])
+                        int(line.split(sep="  ", maxsplit=1)[1]) 
+                        ])
                 except ValueError:
                     pass
-        print(len(self.data))
     
     def preprocess(self):
         '''
@@ -138,6 +141,7 @@ class birds:
             except IndexError:
                 pass
             i += 1
+    
 
     # Plots a graph within a given interval.
     def plot(self, startdate, days):
@@ -223,6 +227,7 @@ class birds:
         None.
 
         '''
+        # Prompts the user for a start date.
         while True:
             promptStart = input("Please enter a starting date.")
             try:
@@ -244,6 +249,7 @@ class birds:
                 continue
             else:
                 break
+        # Prompts the user for number of days.
         while True:
             try:
                 promptDays = int(input("How many days after the start date"
