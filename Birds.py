@@ -47,8 +47,6 @@ class birds:
         with open(textfile, "r") as txt:
             for line in txt:
                 try:
-                    # Lägg till en entry när timedelta är för stort!
-                    # if ...... :
                     self.data.append([pytz.utc.localize(
                         datetime.datetime.strptime(line.split(sep="  ", 
                                                               maxsplit=1)[0]
@@ -88,6 +86,7 @@ class birds:
                     self.data[i][1] = self.data[i-1][1]
             except IndexError:
                 pass
+
         # If the absolute value of the difference between the next and the
         # current item in the list is less than or equal to 8, the current
         # item takes on the value of the difference. Otherwise, the
@@ -107,6 +106,7 @@ class birds:
                     self.data[i][1] = 0
             except IndexError:
                 pass
+            
         # Removes and adds lines based on timedeltas which are too low or
         # high.
         # ISSUE: FOR SOME REASON NO ITEMS ARE DELETED WHILE 20-30K ITEMS
@@ -115,16 +115,16 @@ class birds:
         while (i <= len(self.data)):
             try:
                 if (self.data[i][0] + datetime.timedelta
-                        (minutes=1, seconds=40) > self.data[i+1][0]):
-                    if (self.data[i][1] != 0):
-                        pass
-                    else:
-                        del self.data[i][0]
+                    (minutes=1, seconds=30) > self.data[i+1][0]):
+                # if (self.data[i][1] != 0):
+                #     pass
+                # else:
+                    del self.data[i+1]
                 elif (self.data[i][0] + datetime.timedelta(minutes=3) <
-                          self.data[i+1][0]):
+                      self.data[i+1][0]):
                     self.data.insert(i + 1, [self.data[i][0] + 
-                                              datetime.timedelta(minutes=2)
-                                              , self.data[i][1]])
+                                          datetime.timedelta(minutes=2)
+                                          , self.data[i][1]])
             except IndexError:
                 pass
             i += 1
