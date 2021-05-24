@@ -97,14 +97,15 @@ class birds:
         #        VALUES TO 8 INSTEAD OF 0 IF THE NUMBER IS PRETTY CLOSE TO
         #        8.
         for i in range(len(self.data)):
+            maxmv = 20
             try:
-                if (self.data[i+1][1] - self.data[i][1] <= 8 and
+                if (self.data[i+1][1] - self.data[i][1] <= maxmv and
                         self.data[i+1][1] - self.data[i][1] >= 0):
                     self.data[i][1] = abs(self.data[i+1][1] - 
                                           self.data[i][1])
                 else:
-                    if (self.data[i+1][1] - self.data[i][1] > 8):
-                        self.data[i][1] = 8
+                    if (self.data[i+1][1] - self.data[i][1] > maxmv):
+                        self.data[i][1] = maxmv
                     else:
                         self.data[i][1] = 0
             except IndexError:
