@@ -7,6 +7,7 @@ Created on Sat May 22 18:04:50 2021
 
 import datetime
 import pytz
+import numpy
 from matplotlib.pyplot import *
 # ASTRAL CAN BE USED FOR SUNRISE/SUNSET TIMES.
 # import astral
@@ -72,6 +73,11 @@ class birds:
             '%Y-%m-%d %H:%M:%S.%f' and the corresponding integer should
             be separated by spaces. Each datapoint has to be separated by
             a new line.
+        
+        RETURNS
+        -------
+        None.
+        
         '''
         # Sorting the data chronologically
         self.data.sort(key=lambda x: x[0])
@@ -134,54 +140,136 @@ class birds:
             i += 1
 
     # Plots a graph within a given interval.
-    def plot(self, startdate=None, numberofdays=None):
-        startdate=pytz.utc.localize(datetime.datetime.strptime
-                                    (startdate,'%Y-%m-%d %H:%M:%S.%f')
-                                    ).astimezone(pytz.timezone(
-                                        'Europe/Stockholm'))
-        dates=[self.data[i][0] for i in range(0, len(BirdsData.data))]
-        date = int(len(self.data) / 2)
+    def plot(self, startdate, days):
+        '''
+        Method plots movements in the bird nest within a given time
+        interval and outputs the plot.
+    
+        PARAMETERS
+    
+        self: (.txt file) 
+            A textfile with dates, times and numbers that correspond to
+            movements of Birds. Datetime must be in format 
+            '%Y-%m-%d %H:%M:%S.%f' and the corresponding integer should
+            be separated by spaces. Each datapoint has to be separated by
+            a new line.
+            
+        startdate: (datetime.datetime object)
+            A datetime object that sets the starting date for the plot.
+        
+        days: (datetime.timedelta object)
+            A timedelta object that sets the end date for the plot as the
+            number of days from the startdate.
+            
+        RETURNS
+        -------
+        None.
+        
+        '''
+        # Finds the list index of the startdate in self.data.
+        llimit = 0
+        ulimit = len(self.data)
         while (True):
-            if (date = 0):
-                startdateindex = 0
-            if (self.data[date - 1][0] <= startdate
-                    <= self.data[date + 1][0]):
-                startdateindex = date
+            date = int((llimit + ulimit) / 2)
+            if (date == 0):
+                startIndex = 0
+                break
+            if (date == ulimit - 1):
+                startIndex = ulimit - 1
+                break
+            if (self.data[date - 1][0] < startdate
+                    < self.data[date + 1][0]):
+                startIndex = date
                 break
             elif startdate < self.data[date][0]:
-                date = date + int(date / 2)
+                ulimit = date
             elif self.data[date][0] < startdate:
-                date = date - int(date / 2)aa
-        for date in dates:
-            if startdate < date:
-                startdate=date
-                enddate=startdate+datetime.timedelta(days=numberofdays)
-                break
-        for i in dates:
-            if enddate < i:
-                return i
-                break
-        endindex = dates.index(i)
-        startindex=dates.index(startdate)
-        changedates = [abs(self.data[i][1] - self.data[i - 1][1]) 
-                       if abs(self.data[i][1] - self.data[i - 1][1])<8 
-                       else 0  for i in range(0, endindex)]
-        if numberofdays < 10:
-            sumdates = []
-            for i in range(startindex, endindex):
-                sumdates.append(sum(changedates[:i+1]))
-            y_values=sumdates
-        else:
-            y_values = changedates[startindex:endindex]
-
-        x_values = [matplotlib.dates.date2num(dates[i]) for i in range(startindex,endindex)]
-        matplotlib.pyplot.plot_date(x_values, y_values, label="Movement", marker=".", markersize="8")
-        title("."); legend(); xticks(rotation=45); xlabel(" "); ylabel(" ")
+                llimit = date
+        # The enddate is set to the startdate + the number of days.
+        endDate = self.data[startIndex][0] + days
+        # Finds the list index of the enddate.
+        endIndex = startIndex
+        while self.data[endIndex][0] < endDate:
+            endIndex += 1
+        # Sets x-values to matplotlib.dates.date2num datatype and creates
+        # x-axis.
+        x_values = [matplotlib.dates.date2num(self.data[i][0]) for i in
+                    range(startIndex, endIndex)]
+        # Sets y-values to number of movements and matches dates.
+        y_values = [self.data[i][1] for i in range(startIndex - 1, 
+                                                    endIndex - 1)]
+        matplotlib.pyplot.plot_date(x_values, y_values, label="Movement"
+                                    , marker=".", markersize="8")
+        title("."); legend(); xticks(rotation=45); xlabel(" "); 
+        ylabel(" ")
         show()
+
+    def UI(self):
+        '''
+        Method starts a UI that prompts the user for input for the plots.
+        The method finally calls the "plot" method and outputs a plot.
+        
+        PARAMETERS
+        
+        self: (.txt file)
+            A textfile with dates, times and numbers that correspond to
+            movements of Birds. Datetime must be in format 
+            '%Y-%m-%d %H:%M:%S.%f' and the corresponding integer should
+            be separated by spaces. Each datapoint has to be separated by
+            a new line.
+            
+        Returns
+        -------
+        None.
+
+        '''
+        while True:
+            promptStart = input("Please enter a starting date.")
+            try:
+                if len(promptStart) == 19:
+                    promptStart = promptStart + ".000000"
+                elif len(promptStart) == 10:
+                    promptStart = promptStart + " 00:00:00.000000"
+                promptStart = pytz.utc.localize(datetime.datetime.strptime
+                                    (promptStart,'%Y-%m-%d %H:%M:%S.%f')
+                                    ).astimezone(pytz.timezone(
+                                        'Europe/Stockholm'))
+            except ValueError:
+                print("Dates must be in format: YYYY-MM-DD HH:MM:SS")
+                continue
+            if (promptStart < self.data[0][0] or 
+                    self.data[-1][0] < promptStart):
+                print("Startdate must be between 2015-01-25 14:05:41.274647 "
+                  + "and 2016-01-16 17:22:10.171150")
+                continue
+            else:
+                break
+        while True:
+            try:
+                promptDays = int(input("How many days after the start date"
+                           + " do you wish to plot?"))
+            except ValueError:
+                print("You must enter a number.")
+                continue
+            if promptDays <= 0:
+                print("You must enter a positive value.")
+                continue
+            promptDays = datetime.timedelta(days = promptDays)
+            if ((self.data[-1][0]) < (promptStart + promptDays)):
+                print("The file doesn't measure beyond 2016-01-16 " + 
+                      "17:22:10.171150. Plot will only include dates up to" +
+                      " this point.")
+                promptDays = self.data[-1][0] - promptStart
+                break
+            else:
+                break
+        self.plot(promptStart, promptDays)
         
 birdsData = birds(r"C:\Users\willi\Documents\GitHub\NUMA01\bird_jan25jan16.txt")
 birdsData.preprocess()
-print(len(birdsData.data))
+birdsData.UI()
+        
+    
 
 
 #ställen där de går bakåt i tiden
