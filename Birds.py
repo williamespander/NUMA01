@@ -9,7 +9,7 @@ import datetime
 import pytz
 import numpy
 from matplotlib.pyplot import *
-from astral import Location
+from astral import *
 # ASTRAL CAN BE USED FOR SUNRISE/SUNSET TIMES.
 # import astralaa
 
@@ -60,7 +60,23 @@ class birds:
                         ])
                 except ValueError:
                     pass
-    
+        Astral.sun_utc
+        self.Color = numpy.zeros(len(self.data))
+        while (self.data[i][0] < night[0]):
+            night 
+        for i in range(len(self.data)):
+            
+            a = self.data[i][0]
+            night = datetime.date(self.data[i][0])
+            
+            if night:
+                #self.Color[i] = 0
+                  pass
+            else:
+                #self.Colbor[i] = 1
+                pass
+            
+        
     def preprocess(self):
         '''
         Method preprocesses the datafile. Data corruption were counts are
@@ -141,6 +157,15 @@ class birds:
             except IndexError:
                 pass
             i += 1
+        nighttime = Astral()
+        latitude = 55.72
+        longitude = 13.35
+        for i in range(len(self.data)):
+            nighttime = nighttime.night_utc((self.data[i][0])
+                                            .astimezone(
+                                            pytz.timezone(
+                                            'Europe/Stockholm')),
+                                            latitude, longitude)
     
 
     # Plots a graph within a given interval.
@@ -206,7 +231,14 @@ class birds:
                                     , marker=".", markersize="8")
         title("."); legend(); xticks(rotation=45); xlabel(" "); 
         ylabel(" ")
-        show()
+        #show()
+        for i in range(self.Color):
+            pass
+        axvspan(datetime.time(18, 0, 0), 
+                datetime.time(21, 0, 0), 
+                facecolor='red', alpha=0.25)
+
+            
 
     def UI(self):
         '''
