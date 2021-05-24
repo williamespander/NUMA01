@@ -195,7 +195,7 @@ class birds:
         # x-axis.
         x_values = [matplotlib.dates.date2num(self.data[i][0]) for i in
                     range(startIndex, endIndex)]
-        # Sets y-values to number of movements and matches dates.
+        # Sets y-values to number of movements and matches dates.   
         y_values = [self.data[i][1] for i in range(startIndex - 1, 
                                                     endIndex - 1)]
         matplotlib.pyplot.plot_date(x_values, y_values, label="Movement"
@@ -259,8 +259,7 @@ class birds:
                 print("The file doesn't measure beyond 2016-01-16 " + 
                       "17:22:10.171150. Plot will only include dates up to" +
                       " this point.")
-                promptDays = self.data[-1][0] - promptStart
-                break
+                continue
             else:
                 break
         self.plot(promptStart, promptDays)
