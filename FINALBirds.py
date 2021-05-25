@@ -240,12 +240,19 @@ class birds:
 
         matplotlib.pyplot.plot_date(x_values, y_values, label="Movement"
                                     , marker=".", markersize="5", linewidth=3, linestyle='-')
-        Colors = self.Color[startIndex-1 : endIndex-1]
-        for i in range(len(Colors)-1):    
-            if Colors[i] == 1:    
-                matplotlib.pyplot.axvspan(xmin = x_values[i], xmax = x_values[i+1] , ymax = max(y_values), color = 'red', alpha = 0.1) 
-            else:
-                pass
+        if days <= datetime.timedelta(days = 30):
+            Colors = self.Color[startIndex-1 : endIndex-1]
+            for i in range(len(Colors)-1):    
+                if Colors[i] == 1:    
+                    matplotlib.pyplot.axvspan(xmin = x_values[i], xmax = 
+                                              x_values[i+1] , 
+                                              ymax = max(y_values), 
+                                              color = 'red', alpha = 0.1) 
+                else:
+                    pass
+        else:
+            print("Won't print day/night for intervals greater than "
+                  "30 days.")
         title("."); legend(); xticks(rotation=45); xlabel(" "); 
         ylabel(" ")
         show()
@@ -316,7 +323,7 @@ class birds:
 
 
         
-birdsData = birds(r"C:/Users/claud/OneDrive/Documents/bird_jan25jan16.txt")
+birdsData = birds(r"C:\Users\willi\Documents\GitHub\NUMA01\bird_jan25jan16.txt")
 birdsData.preprocess()
 birdsData.UI()
         

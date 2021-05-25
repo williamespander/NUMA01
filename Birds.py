@@ -7,11 +7,8 @@ Created on Sat May 22 18:04:50 2021
 
 import datetime
 import pytz
-import numpy
-from matplotlib.pyplot import *
-from astral import *
-# ASTRAL CAN BE USED FOR SUNRISE/SUNSET TIMES.
-# import astralaa
+import matplotlib.pyplot
+import astral
 
 class birds:
     '''
